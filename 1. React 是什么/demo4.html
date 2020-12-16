@@ -69,7 +69,7 @@
     <script type="text/babel">
       function Square(props) {
         return (
-          <button className="square" onClick={props.onClick}>
+          <button className="square" onClick={props.onClick} id={props.id}>
             {props.value}
           </button>
         );
@@ -81,6 +81,7 @@
             <Square
               value={this.props.squares[i]}
               onClick={() => this.props.onClick(i)}
+              id={i}
             />
           );
         }
@@ -106,6 +107,26 @@
             </div>
           );
         }
+        // 使用两个循环来渲染出棋盘的格子，而不是在代码里写死
+        /*render() {
+          const that = this
+          const crosswise = [0, 1, 2];
+          return (
+            crosswise.map(function (i) {
+              return (
+                <div key={i} className="board-row">
+                  {
+                    crosswise.map(function (j) {
+                      return (
+                        that.renderSquare(j + 3 * i)
+                      );
+                    })
+                  }
+                </div>
+              );
+            })
+          );
+        }*/
       }
 
       class Game extends React.Component {
@@ -145,22 +166,58 @@
         }
 
         jumpTo(step) {
+          const list = this.state.history[this.state.stepNumber].squares;
+          let r = list.filter((s) => {
+            return s && s.trim();
+          });
+          for (let i = 1; i <= r.length; i++) {
+            if (i !== step) {
+              document.getElementById('history' + i).style.backgroundColor = '#efefef';
+            }
+          }
+          // 在历史记录列表中加粗显示当前选择的项目
+          document.getElementById('history' + step).style.backgroundColor = '#07f6e2';
           this.setState({
             stepNumber: step,
             xIsNext: step % 2 === 0,
           });
         }
 
+        // 添加一个可以升序或降序显示历史记录的按钮
+        orderBy(status) {
+          const history = this.state.history;
+          let r = history[0].squares.filter((s) => {
+            return s && s.trim();
+          });
+          // 正序排列
+          if (status === 1 && r.length !== 0) {
+            this.state.history = history.reverse()
+          }
+          // 倒序排列
+          if (status === 2&& r.length === 0) {
+            this.state.history = history.reverse()
+          }
+        }
+
         render() {
           const history = this.state.history;
           const current = history[this.state.stepNumber];
-          const winner = calculateWinner(current.squares);
+          const ret = calculateWinner(current.squares);
+          let winner = calculateWinner(current.squares);
+          // 每当有人获胜时，高亮显示连成一线的 3 颗棋子。
+          if (ret != null) {
+            winner = calculateWinner(current.squares).split(';')[0];
+            const index = calculateWinner(current.squares).split(';')[1].split(',');
+            index.map(function (i) {
+              document.getElementById(index[i]).style.backgroundColor = '#07f6e2';
+            })
+          }
 
           const moves = history.map((step, move) => {
             const desc = move ? "Go to move #" + move : "Go to game start";
             return (
               <li key={move}>
-                <button onClick={() => this.jumpTo(move)}>{desc}</button>
+                <button onClick={() => this.jumpTo(move)} id={'history' + move}>{desc}</button>
               </li>
             );
           });
@@ -170,6 +227,10 @@
             status = "Winner: " + winner;
           } else {
             status = "Next player: " + (this.state.xIsNext ? "X" : "O");
+          }
+          // 当无人获胜时，显示一个平局的消息
+          if (history.length === 10) {
+            status = "Draw";
           }
 
           return (
@@ -182,6 +243,8 @@
               </div>
               <div className="game-info">
                 <div>{status}</div>
+                <button onClick={() => this.orderBy(1)}>正序</button>
+                <button onClick={() => this.orderBy(2)}>倒序</button>
                 <ol>{moves}</ol>
               </div>
             </div>
@@ -204,6 +267,7 @@
           [0, 4, 8],
           [2, 4, 6],
         ];
+        // a,b,c代表上述的三个数字，squares[下标]的值都为X或O时，一方胜利并返回胜利方
         for (let i = 0; i < lines.length; i++) {
           const [a, b, c] = lines[i];
           if (
@@ -211,7 +275,7 @@
             squares[a] === squares[b] &&
             squares[a] === squares[c]
           ) {
-            return squares[a];
+            return squares[a] + ';' + lines[i];
           }
         }
         return null;
