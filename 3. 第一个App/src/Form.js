@@ -13,11 +13,14 @@ class Form extends Component {
     }
 
     handleChange = event => {
+        this.setState(this.props.updateData)
+        this.props.handleUpdate();
         const { name, value } = event.target;
-
         this.setState({
             [name] : value
         });
+        
+
     }
 
     onFormSubmit = (event) => {
@@ -28,8 +31,7 @@ class Form extends Component {
     }
 
     render() {
-        const { name, job } = this.state; 
-
+        const { name, job } = this.props.updateData ? this.props.updateData : this.state;
         return (
             <form onSubmit={this.onFormSubmit}>
                 <label for="name">Name</label>

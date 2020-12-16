@@ -1,224 +1,260 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>tic-tac-toe</title>
-    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
 
-    <!-- Don't use this in production: -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <title>tic-tac-toe</title>
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
 
-    <style>
-      body {
-        font: 14px "Century Gothic", Futura, sans-serif;
-        margin: 20px;
-      }
+  <!-- Don't use this in production: -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-      ol,
-      ul {
-        padding-left: 30px;
-      }
+  <style>
+    body {
+      font: 14px "Century Gothic", Futura, sans-serif;
+      margin: 20px;
+    }
 
-      .board-row:after {
-        clear: both;
-        content: "";
-        display: table;
-      }
+    ol,
+    ul {
+      padding-left: 30px;
+    }
 
-      .status {
-        margin-bottom: 10px;
-      }
+    .board-row:after {
+      clear: both;
+      content: "";
+      display: table;
+    }
 
-      .square {
-        background: #fff;
-        border: 1px solid #999;
-        float: left;
-        font-size: 24px;
-        font-weight: bold;
-        line-height: 34px;
-        height: 34px;
-        margin-right: -1px;
-        margin-top: -1px;
-        padding: 0;
-        text-align: center;
-        width: 34px;
-      }
+    .status {
+      margin-bottom: 10px;
+    }
 
-      .square:focus {
-        outline: none;
-      }
+    .square {
+      background: #fff;
+      border: 1px solid #999;
+      float: left;
+      font-size: 24px;
+      font-weight: bold;
+      line-height: 34px;
+      height: 34px;
+      margin-right: -1px;
+      margin-top: -1px;
+      padding: 0;
+      text-align: center;
+      width: 34px;
+    }
 
-      .kbd-navigation .square:focus {
-        background: #ddd;
-      }
+    .square:focus {
+      outline: none;
+    }
 
-      .game {
-        display: flex;
-        flex-direction: row;
-      }
+    .kbd-navigation .square:focus {
+      background: #ddd;
+    }
 
-      .game-info {
-        margin-left: 20px;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="tic-tac-toe"></div>
+    .game {
+      display: flex;
+      flex-direction: row;
+    }
 
-    <script type="text/babel">
-      function Square(props) {
+    .game-info {
+      margin-left: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="tic-tac-toe"></div>
+
+  <script type="text/babel">
+    function Square(props) {
+      return (
+        <button className="square" onClick={props.onClick} id={props.id}>
+          {props.value}
+        </button>
+      );
+    }
+
+    class Board extends React.Component {
+      renderSquare(i) {
         return (
-          <button className="square" onClick={props.onClick}>
-            {props.value}
-          </button>
+          <Square
+            value={this.props.squares[i]} id={i} key={i}
+            onClick={() => this.props.onClick(i)}
+          />
         );
       }
 
-      class Board extends React.Component {
-        renderSquare(i) {
-          return (
-            <Square
-              value={this.props.squares[i]}
-              onClick={() => this.props.onClick(i)}
-            />
-          );
-        }
+      render() {
+        let boardRow = [];
+        let n = 0;
 
-        render() {
-          return (
-            <div>
-              <div className="board-row">
-                {this.renderSquare(0)}
-                {this.renderSquare(1)}
-                {this.renderSquare(2)}
-              </div>
-              <div className="board-row">
-                {this.renderSquare(3)}
-                {this.renderSquare(4)}
-                {this.renderSquare(5)}
-              </div>
-              <div className="board-row">
-                {this.renderSquare(6)}
-                {this.renderSquare(7)}
-                {this.renderSquare(8)}
-              </div>
-            </div>
-          );
+        for (let index = 0; index < 3; index++) {
+          let square = [];
+          for (let j = 0; j < 3; j++, n++) {
+            square.push(this.renderSquare(n));
+          }
+          boardRow.push(<div className="board-row" key={index}>{square}</div>);
         }
+        return (
+          <div>
+            {boardRow}
+          </div>
+        );
+      }
+    }
+
+    class Game extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = {
+          history: [
+            {
+              squares: Array(9).fill(null),
+              row: 0,
+              col: 0
+            },
+          ],
+          stepNumber: 0,
+          xIsNext: true,
+        };
       }
 
-      class Game extends React.Component {
-        constructor(props) {
-          super(props);
-          this.state = {
-            history: [
-              {
-                squares: Array(9).fill(null),
-              },
-            ],
-            stepNumber: 0,
-            xIsNext: true,
-          };
+      handleClick(i) {
+        const history = this.state.history.slice(
+          0,
+          this.state.stepNumber + 1
+        );
+        const current = history[history.length - 1];
+        const squares = current.squares.slice();
+        if (calculateWinner(squares) || squares[i]) {
+          return;
         }
+        squares[i] = this.state.xIsNext ? "X" : "O";
+        this.setState({
+          history: history.concat([
+            {
+              squares: squares,
+              row: parseInt(i / 3 + 1),
+              col: i % 3 + 1
+            },
+          ]),
+          stepNumber: history.length,
+          xIsNext: !this.state.xIsNext,
+          sortFlg: true
+        });
+      }
 
-        handleClick(i) {
-          const history = this.state.history.slice(
-            0,
-            this.state.stepNumber + 1
-          );
-          const current = history[history.length - 1];
-          const squares = current.squares.slice();
-          if (calculateWinner(squares) || squares[i]) {
-            return;
+      jumpTo(step,winner) {
+        if (winner) {
+          let array = document.getElementsByClassName("square");
+          for (let index = 0; index < array.length; index++) {
+            array[index].style.backgroundColor = 'white';
           }
-          squares[i] = this.state.xIsNext ? "X" : "O";
-          this.setState({
-            history: history.concat([
-              {
-                squares: squares,
-              },
-            ]),
-            stepNumber: history.length,
-            xIsNext: !this.state.xIsNext,
-          });
         }
+        this.setState({
+          stepNumber: step,
+          xIsNext: step % 2 === 0,
+        });
+      }
 
-        jumpTo(step) {
-          this.setState({
-            stepNumber: step,
-            xIsNext: step % 2 === 0,
-          });
-        }
+      sortHistory() {
+        this.setState({
+          sortFlg: !this.state.sortFlg
+        })
+      }
 
-        render() {
-          const history = this.state.history;
-          const current = history[this.state.stepNumber];
-          const winner = calculateWinner(current.squares);
+      render() {
+        const history = this.state.history;
+        const current = history[this.state.stepNumber];
+        const winner = calculateWinner(current.squares);
 
-          const moves = history.map((step, move) => {
-            const desc = move ? "Go to move #" + move : "Go to game start";
+        const moves = history.map((step, move) => {
+          let desc = move ?
+            'Go to move #' + ' (' + step.row + ',' + step.col + ')' :
+            'Go to game start';
+          if (current === step) {
             return (
               <li key={move}>
-                <button onClick={() => this.jumpTo(move)}>{desc}</button>
+                <button onClick={() => this.jumpTo(move, winner)}><strong>{desc}</strong></button>
               </li>
             );
-          });
+          } else {
+            return (
+              <li key={move}>
+                <button onClick={() => this.jumpTo(move, winner)}>{desc}</button>
+              </li>
+            );
+          }
 
-          let status;
-          if (winner) {
-            status = "Winner: " + winner;
+        });
+
+        let status;
+        if (winner) {
+          status = "Winner: " + winner;
+        } else {
+          if (this.state.stepNumber === 9) {
+            alert('平局')
           } else {
             status = "Next player: " + (this.state.xIsNext ? "X" : "O");
           }
+        }
 
-          return (
-            <div className="game">
-              <div className="game-board">
-                <Board
-                  squares={current.squares}
-                  onClick={(i) => this.handleClick(i)}
-                />
-              </div>
-              <div className="game-info">
-                <div>{status}</div>
-                <ol>{moves}</ol>
-              </div>
+        return (
+          <div className="game">
+            <div className="game-board">
+              <Board
+                squares={current.squares}
+                onClick={(i) => this.handleClick(i)}
+              />
             </div>
-          );
+            <div className="game-info">
+              <div>{status}</div>
+              <div>
+                <button onClick={() => this.sortHistory()}>sort</button>
+              </div>
+              <ol>{this.state.sortFlg ? moves : moves.reverse()}</ol>
+            </div>
+          </div>
+        );
+      }
+    }
+
+    // ========================================
+
+    ReactDOM.render(<Game />, document.getElementById("tic-tac-toe"));
+
+    function calculateWinner(squares) {
+      const lines = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+      ];
+      for (let i = 0; i < lines.length; i++) {
+        const [a, b, c] = lines[i];
+        if (
+          squares[a] &&
+          squares[a] === squares[b] &&
+          squares[a] === squares[c]
+        ) {
+          document.getElementById(a).style.backgroundColor = 'red';
+          document.getElementById(b).style.backgroundColor = 'red';
+          document.getElementById(c).style.backgroundColor = 'red';
+          return squares[a];
         }
       }
+      return null;
+    }
+  </script>
 
-      // ========================================
-
-      ReactDOM.render(<Game />, document.getElementById("tic-tac-toe"));
-
-      function calculateWinner(squares) {
-        const lines = [
-          [0, 1, 2],
-          [3, 4, 5],
-          [6, 7, 8],
-          [0, 3, 6],
-          [1, 4, 7],
-          [2, 5, 8],
-          [0, 4, 8],
-          [2, 4, 6],
-        ];
-        for (let i = 0; i < lines.length; i++) {
-          const [a, b, c] = lines[i];
-          if (
-            squares[a] &&
-            squares[a] === squares[b] &&
-            squares[a] === squares[c]
-          ) {
-            return squares[a];
-          }
-        }
-        return null;
-      }
-    </script>
-
-    <!--
+  <!--
       Note: this page is a great way to try React but it's not suitable for production.
       It slowly compiles JSX with Babel in the browser and uses a large development build of React.
 
@@ -231,5 +267,6 @@
       You can also use React without JSX, in which case you can remove Babel:
       https://reactjs.org/docs/react-without-jsx.html
     -->
-  </body>
+</body>
+
 </html>

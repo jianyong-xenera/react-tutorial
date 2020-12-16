@@ -7,6 +7,7 @@ const TableHeader = () => {
                 <th>Name</th>
                 <th>Job</th>
                 <th>Remove</th>
+                <th>Update</th>
             </tr>
         </thead>
     );
@@ -19,6 +20,7 @@ const TableBody = props => {
                 <td>{row.name}</td>
                 <td>{row.job}</td>
                 <td><button onClick={() => props.removeCharacter(index)}>Delete</button></td>
+                <td><button onClick={() => props.updateCharacter(index)}>Update</button></td>
             </tr>
         );
     });
@@ -27,11 +29,11 @@ const TableBody = props => {
 }
 
 const Table = (props) => {
-    const { characterData, removeCharacter } = props;
+    const { characterData, removeCharacter ,updateCharacter } = props;
         return (
             <table>
                 <TableHeader />
-                <TableBody characterData={characterData} removeCharacter={removeCharacter} />
+                <TableBody characterData={characterData} removeCharacter={removeCharacter} updateCharacter={updateCharacter}/>
             </table>
         );
 }
