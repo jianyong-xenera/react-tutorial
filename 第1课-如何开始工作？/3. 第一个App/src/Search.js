@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-class Form extends Component {
+class Search extends Component {
   constructor(props) {
     super(props);
   }
@@ -8,22 +8,16 @@ class Form extends Component {
   handleChange = (event) => {
     const { name, value } = event.target;
 
-    this.props.onFormChange({
+    this.props.onSearchChange({
       [name]: value,
     });
   };
 
-  handleSubmit = (event) => {
-    event.preventDefault();
-
-    this.props.onFormSubmit();
-  };
-
   render() {
-    const { name, job } = this.props.form;
+    const { name, job } = this.props.search;
 
     return (
-      <form onSubmit={this.handleSubmit}>
+      <form>
         <label for="name">Name</label>
         <input
           type="text"
@@ -40,10 +34,9 @@ class Form extends Component {
           value={job}
           onChange={this.handleChange}
         />
-        <button type="submit">Submit</button>
       </form>
     );
   }
 }
 
-export default Form;
+export default Search;
