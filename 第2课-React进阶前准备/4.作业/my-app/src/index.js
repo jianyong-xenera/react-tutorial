@@ -141,12 +141,12 @@ class FilterProductTable extends React.Component{
 }
 // 自定义数据
 const PRODUCTS = [
-    {category: 'Sporting Goods', price: '$49.99', stocked: true, name: 'Football'},
-    {category: 'Electronics', price: '$99.99', stocked: true, name: 'iPod Touch'},
-    {category: 'Electronics', price: '$399.99', stocked: false, name: 'iPhone 5'},
-    {category: 'Sporting Goods', price: '$9.99', stocked: true, name: 'Baseball'},
-    {category: 'Sporting Goods', price: '$29.99', stocked: false, name: 'Basketball'},
-    {category: 'Electronics', price: '$199.99', stocked: true, name: 'Nexus 7'}
+    {category: 'Game Machine', price: '$149.99', stocked: true, name: 'PS5'},
+    {category: 'Cellphone', price: '$299.99', stocked: true, name: 'xiaomi30'},
+    {category: 'Cellphone', price: '$1399.99', stocked: false, name: 'meizu'},
+    {category: 'Game Machine', price: '$29.99', stocked: true, name: 'computer'},
+    {category: 'Game Machine', price: '$229.99', stocked: false, name: 'switch'},
+    {category: 'Cellphone', price: '$1299.99', stocked: true, name: 'huawei30'}
   ];
 ReactDOM.render(
     <FilterProductTable products={PRODUCTS}/>,
