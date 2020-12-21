@@ -1,72 +1,107 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>tic-tac-toe</title>
-    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
 
-    <!-- Don't use this in production: -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <title>tic-tac-toe</title>
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
 
-    <style>
-      body {
-        font: 14px "Century Gothic", Futura, sans-serif;
-        margin: 20px;
-      }
+  <!-- Don't use this in production: -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-      ol,
-      ul {
-        padding-left: 30px;
-      }
+  <style>
+   body {
+  font: 14px "Century Gothic", Futura, sans-serif;
+  margin: 20px;
+}
 
-      .board-row:after {
-        clear: both;
-        content: "";
-        display: table;
-      }
+ol, ul {
+  padding-left: 30px;
+}
 
-      .status {
-        margin-bottom: 10px;
-      }
+.board-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
 
-      .square {
-        background: #fff;
-        border: 1px solid #999;
-        float: left;
-        font-size: 24px;
-        font-weight: bold;
-        line-height: 34px;
-        height: 34px;
-        margin-right: -1px;
-        margin-top: -1px;
-        padding: 0;
-        text-align: center;
-        width: 34px;
-      }
+.status {
+  margin-bottom: 10px;
+}
 
-      .square:focus {
-        outline: none;
-      }
+.square {
+  background: #fff;
+  border: 1px solid #999;
+  float: left;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 34px;
+  height: 34px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 34px;
+}
 
-      .kbd-navigation .square:focus {
-        background: #ddd;
-      }
+.square:focus {
+  outline: none;
+}
 
-      .game {
-        display: flex;
-        flex-direction: row;
-      }
+.kbd-navigation .square:focus {
+  background: #ddd;
+}
 
-      .game-info {
-        margin-left: 20px;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="tic-tac-toe"></div>
+.game {
+  display: flex;
+  flex-direction: row;
+}
+.content-span{
+  display: inline-block;
+  width: 80px;;
+}
+.moveClick{
+  color:#ff6600;
+  font-weight: 600;
+}
 
-    <script type="text/babel">
+.game-board-button{
+  margin-top: 5px;
+  margin-right: 5px;
+}
+.game-board{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 30%;
+}
+.game-info {
+  margin-left: 20px;
+  margin-right: 20px;
+  width: 30%;
+}
+.game-step{
+  width: 30%;
+}
+.title{
+  text-align: center;
+}
+.hidding{
+  display: none;
+}
+
+  </style>
+</head>
+<body>
+  
+
+  <div id="tic-tac-toe"></div>
+  
+  <script type="text/babel">
+  
+    // square 渲染组件 button
       function Square(props) {
         return (
           <button className="square" onClick={props.onClick}>
@@ -74,40 +109,48 @@
           </button>
         );
       }
-
+// Board 渲染方框组件
       class Board extends React.Component {
-        renderSquare(i) {
+        renderSquare(i,x,y) {
           return (
             <Square
               value={this.props.squares[i]}
-              onClick={() => this.props.onClick(i)}
+              onClick={() => this.props.onClick(i,x,y)}
             />
           );
         }
-
-        render() {
-          return (
-            <div>
-              <div className="board-row">
-                {this.renderSquare(0)}
-                {this.renderSquare(1)}
-                {this.renderSquare(2)}
-              </div>
-              <div className="board-row">
-                {this.renderSquare(3)}
-                {this.renderSquare(4)}
-                {this.renderSquare(5)}
-              </div>
-              <div className="board-row">
-                {this.renderSquare(6)}
-                {this.renderSquare(7)}
-                {this.renderSquare(8)}
-              </div>
-            </div>
-          );
-        }
+  render() {
+    const squares = [];
+    for (let i = 0; i < 3; i++) {
+      let rows = [];
+      for (let j = 0; j < 3; j++) {
+        let key = i * 3 + j
+        rows.push(
+          <Square
+            key={key}
+            value={this.props.squares[key]}
+            onClick={() => { this.props.onClick(key) }}
+          />
+        );
       }
+      squares.push(
+        <div
+          key={i}
+          className="board-row"
+        >
+          {rows}
+        </div>
+      );
+    }
+    return (
+      <div>
+        {squares}
+      </div>
+    );
+}
 
+      }
+      // Game 组件渲染了含有默认值的一个棋盘
       class Game extends React.Component {
         constructor(props) {
           super(props);
@@ -115,14 +158,19 @@
             history: [
               {
                 squares: Array(9).fill(null),
+                   //在这里添加两个新属性，行号和列号
+              row: null,
+              col: null
               },
             ],
             stepNumber: 0,
-            xIsNext: true,
+            xIsNext: true,  
+             //添加列表顺序的状态变量
+           startToEnd : true, 
           };
         }
 
-        handleClick(i) {
+        handleClick(i,x,y) {
           const history = this.state.history.slice(
             0,
             this.state.stepNumber + 1
@@ -136,7 +184,10 @@
           this.setState({
             history: history.concat([
               {
-                squares: squares,
+                squares: squares, 
+          //这里分别拿格子编号i对棋盘的大小3做商和取余，得到行号和列号
+              row: parseInt(i/3)+1,
+              col: i%3+1
               },
             ]),
             stepNumber: history.length,
@@ -150,75 +201,101 @@
             xIsNext: step % 2 === 0,
           });
         }
-
+       //实现按钮的clickOn方法，切换列表顺序
+        changeOrder() {
+            this.setState({
+            startToEnd : !this.state.startToEnd,
+           })
+         }
         render() {
           const history = this.state.history;
           const current = history[this.state.stepNumber];
           const winner = calculateWinner(current.squares);
 
           const moves = history.map((step, move) => {
-            const desc = move ? "Go to move #" + move : "Go to game start";
-            return (
-              <li key={move}>
-                <button onClick={() => this.jumpTo(move)}>{desc}</button>
-              </li>
-            );
-          });
+            const desc = move ? 
+            //显示行号和列号 row clo
+            'Go to move #' + move + ' (' + step.row + ',' + step.col + ')':
+            'Go to game start';
+           //判断是否是当前步，返回加粗或不加粗的组件
+          if(step === current) {
+          return (
+          <li key={move}>
+          <button onClick={() => this.jumpTo(move)}><strong>{desc}</strong></button>
+          </li>
+        );
+       }else {
+        return (
+          <li key={move}>
+          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+         </li>
+    );
+  }
+});
+             //反转
+          let orderableMoves;
+          if(this.state.startToEnd) {
+               orderableMoves = moves;
+         } else {
+            orderableMoves = moves.reverse();
+      }
 
-          let status;
-          if (winner) {
-            status = "Winner: " + winner;
-          } else {
-            status = "Next player: " + (this.state.xIsNext ? "X" : "O");
-          }
-
+let status;
+if(winner){
+  status = "Winner: " + winner;
+}else if (history.length > 9) {
+  status = 'Draw'
+}else{
+  status = "Next player: " + (this.state.xIsNext ? "X" : "O");
+}
           return (
             <div className="game">
               <div className="game-board">
                 <Board
                   squares={current.squares}
-                  onClick={(i) => this.handleClick(i)}
+                  onClick={(i,x,y) => this.handleClick(i,x,y)}
                 />
               </div>
               <div className="game-info">
                 <div>{status}</div>
-                <ol>{moves}</ol>
+             {/* 升降序按钮 */}
+              <button onClick={() => {this.changeOrder()}}>↑↓</button>
+                <ol>{orderableMoves}</ol>
               </div>
             </div>
           );
         }
       }
-
+    
       // ========================================
 
       ReactDOM.render(<Game />, document.getElementById("tic-tac-toe"));
 
-      function calculateWinner(squares) {
-        const lines = [
-          [0, 1, 2],
-          [3, 4, 5],
-          [6, 7, 8],
-          [0, 3, 6],
-          [1, 4, 7],
-          [2, 5, 8],
-          [0, 4, 8],
-          [2, 4, 6],
-        ];
-        for (let i = 0; i < lines.length; i++) {
-          const [a, b, c] = lines[i];
-          if (
-            squares[a] &&
-            squares[a] === squares[b] &&
-            squares[a] === squares[c]
-          ) {
-            return squares[a];
-          }
-        }
-        return null;
+      function calculateWinner(squares, flag = false) {
+    const lines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+    for (let i = 0; i < lines.length; i++) {
+      const [a, b, c] = lines[i];
+      if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+        if (flag) {
+          return [a, b, c]
+        } else { return squares[a]; }
+
       }
+    }
+    return null;
+  }
     </script>
 
-    <!--
+  <!--
       Note: this page is a great way to try React but it's not suitable for production.
       It slowly compiles JSX with Babel in the browser and uses a large development build of React.
 
@@ -231,5 +308,6 @@
       You can also use React without JSX, in which case you can remove Babel:
       https://reactjs.org/docs/react-without-jsx.html
     -->
-  </body>
+</body>
+
 </html>
