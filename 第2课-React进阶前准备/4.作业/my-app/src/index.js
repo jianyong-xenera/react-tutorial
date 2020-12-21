@@ -100,7 +100,7 @@ class SearchBar extends React.Component{
     }
 }
 
-
+// 搜索头
 class FilterProductTable extends React.Component{
     constructor(props){
         super(props);
@@ -139,6 +139,7 @@ class FilterProductTable extends React.Component{
         )
     }
 }
+// 自定义数据
 const PRODUCTS = [
     {category: 'Sporting Goods', price: '$49.99', stocked: true, name: 'Football'},
     {category: 'Electronics', price: '$99.99', stocked: true, name: 'iPod Touch'},
