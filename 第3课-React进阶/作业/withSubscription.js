@@ -37,18 +37,18 @@ function withSubscription(WrappedComponent, selectData) {
 
 
 function subscribeHook(selectData) {
-  const [isOnline, setIsOnline] = useState(null);
+  const [data, selectData] = useState(null);
 
   function handleStatusChange(status) {
-    setIsOnline(status.isOnline);
+    selectData(DataSource, status);
   }
 
   useEffect(() => {
-    ChatAPI.subscribeToFriendStatus(selectData, handleStatusChange);
+    DataSource.addChangeListener(selectData, handleStatusChange);
     return () => {
-      ChatAPI.unsubscribeFromFriendStatus(selectData, handleStatusChange);
+      DataSource.removeChangeListener(selectData, handleStatusChange);
     };
   });
 
-  return isOnline;
+  return data;
 }
