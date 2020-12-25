@@ -1,5 +1,5 @@
 import React ,{Component,useState} from 'react';
-import './App.css';
+import './App.css'; 
 
 const PRODUCTS = [
   {category: 'Sporting Goods', price: '$49.99', stocked: true, name: 'Football'},
