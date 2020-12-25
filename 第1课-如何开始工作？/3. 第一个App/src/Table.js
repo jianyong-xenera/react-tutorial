@@ -23,17 +23,17 @@ const TableBody = props => {
         );
     });
 
-    return <tbody>{rows}</tbody>;
+    return <tbody>{rows}</tbody>;   
 }
 
 const Table = (props) => {
     const { characterData, removeCharacter } = props;
-        return (
-            <table>
-                <TableHeader />
-                <TableBody characterData={characterData} removeCharacter={removeCharacter} />
-            </table>
-        );
+    return (
+        <table>
+            <TableHeader />
+            <TableBody characterData={characterData} removeCharacter={removeCharacter} />
+        </table>
+    );
 }
 
 export default Table;
