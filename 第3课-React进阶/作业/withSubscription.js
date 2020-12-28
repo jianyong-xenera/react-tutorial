@@ -1,34 +1,21 @@
+import { func } from 'prop-types';
+import React,{useState,useEffect} from 'react';
 // 此函数接收一个组件...
-function withSubscription(WrappedComponent, selectData) {
+function usewithSubscription(props) {
+  const [data,setdata]=useState(null)
   // ...并返回另一个组件...
-  return class extends React.Component {
-    constructor(props) {
-      super(props);
-      this.handleChange = this.handleChange.bind(this);
-      this.state = {
-        data: selectData(DataSource, props),
-      };
-    }
-
-    componentDidMount() {
-      // ...负责订阅相关的操作...
-      DataSource.addChangeListener(this.handleChange);
-    }
-
-    componentWillUnmount() {
-      DataSource.removeChangeListener(this.handleChange);
-    }
-
-    handleChange() {
+  useEffect(()=> {
+    function handleChange(status){
       this.setState({
-        data: selectData(DataSource, this.props),
-      });
+        setdata(DataSource,status)
+      })
     }
-
-    render() {
-      // ... 并使用新数据渲染被包装的组件!
-      // 请注意，我们可能还会传递其他属性
-      return <WrappedComponent data={this.state.data} {...this.props} />;
-    }
-  };
+      // ...负责订阅相关的操作...
+      DataSource.addChangeListener(props,this.handleChange);
+      return () =>{
+      DataSource.removeChangeListener(props,this.handleChange);
+      }
+  })
+  return data
 }
+// 抽出逻辑共享
