@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 // 此函数接收一个组件...
 function withSubscription(WrappedComponent, selectData) {
   // ...并返回另一个组件...
@@ -31,4 +33,24 @@ function withSubscription(WrappedComponent, selectData) {
       return <WrappedComponent data={this.state.data} {...this.props} />;
     }
   };
+}
+function FriendListItem(props) {
+  const [isOnline, setIsOnline] = useState(null);
+
+  function handleStatusChange(status) {
+    setIsOnline(status.isOnline);
+  }
+
+  useEffect(() => {
+    ChatAPI.subscribeToFriendStatus(props.friend.id, handleStatusChange);
+    return () => {
+      ChatAPI.unsubscribeFromFriendStatus(props.friend.id, handleStatusChange);
+    };
+  });
+
+  return (
+    <li style={{ color: isOnline ? 'green' : 'black' }}>
+      {props.friend.name}
+    </li>
+  );
 }
